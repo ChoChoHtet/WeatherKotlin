@@ -24,6 +24,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 
 class MainActivity : AppCompatActivity(), MainView, BaseVH.Listener {
+    override fun hideRecyclerView() {
+        weather_list.visibility=View.GONE
+    }
+
     override fun showMessage(message:String) {
         Toast.makeText(this,message,Toast.LENGTH_LONG).show()
     }
@@ -136,6 +140,15 @@ class MainActivity : AppCompatActivity(), MainView, BaseVH.Listener {
     private fun handleError(error: Throwable) {
         Log.i("Message", error.localizedMessage)
         Toast.makeText(applicationContext, "Error Message ${error.localizedMessage}", Toast.LENGTH_LONG).show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
+        if(disposable.isDisposed){
+            disposable.dispose()
+            disposable.clear()
+        }
     }
 
 

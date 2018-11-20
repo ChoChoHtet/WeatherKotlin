@@ -8,4 +8,5 @@ interface MainView {
     fun showProgressbar()
     fun hideProgressbar()
     fun loadJsonData()
+    fun hideRecyclerView()
 }

@@ -4,7 +4,7 @@ import android.content.Context
 import com.android.kotlin.weatherapp.CheckConnection
 import com.android.kotlin.weatherapp.view.MainView
 
-class MainPresenter(val mainView: MainView?) {
+class MainPresenter(private var mainView: MainView?) {
     fun checkConnect(context: Context){
       when{
           !CheckConnection.checkConnection(context)->
@@ -15,6 +15,9 @@ class MainPresenter(val mainView: MainView?) {
 
           else -> mainView?.loadJsonData()
       }
+    }
+    fun onDestroy(){
+        mainView= null
     }
 
 

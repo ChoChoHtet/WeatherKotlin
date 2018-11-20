@@ -23,12 +23,16 @@ import kotlinx.android.synthetic.main.activity_city.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 class CityActivity : AppCompatActivity(),MainView,BaseVH.Listener {
+    override fun hideRecyclerView() {
+        city_list.visibility=View.GONE
+    }
+
     override fun showMessage(message: String) {
         Toast.makeText(this,message, Toast.LENGTH_LONG).show()
     }
 
     override fun showSnackBar() {
-        val snackbar = Snackbar.make(layout, "No Internet Connection!", Snackbar.LENGTH_INDEFINITE)
+        val snackbar = Snackbar.make(relative, "No Internet Connection!", Snackbar.LENGTH_INDEFINITE)
             .setAction("Try Again") { v ->
                 if (CheckConnection.checkConnection(v.context)) {
                     fetchJSONData()
@@ -56,7 +60,7 @@ class CityActivity : AppCompatActivity(),MainView,BaseVH.Listener {
     }
 
     private lateinit var weatherApi:WeatherApiService
-    private  var disposable: CompositeDisposable?=null
+    private lateinit var disposable: CompositeDisposable
     private lateinit var adapter:WeatherAdapter
     private val presenter=CityPresenter(this)
 
@@ -69,14 +73,14 @@ class CityActivity : AppCompatActivity(),MainView,BaseVH.Listener {
         adapter = WeatherAdapter()
         adapter.setOnItemClickListener(this)
         btnSearch.setOnClickListener {
-           presenter.checkConnect(this)
+           presenter.checkConnect(it.context)
             //fetchJSONData()
         }
 
     }
 
     private fun fetchJSONData() {
-        disposable?.add(weatherApi.getDataByCity(search_city.text.toString())
+        disposable.add(weatherApi.getDataByCity(search_city.text.toString())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(this::handleResponse,this::handleError))
@@ -110,5 +114,14 @@ class CityActivity : AppCompatActivity(),MainView,BaseVH.Listener {
     private fun initRecyclerView() {
         city_list.layoutManager=LinearLayoutManager(this)
         city_list.setHasFixedSize(true)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
+        if(disposable.isDisposed){
+            disposable.dispose()
+            disposable.clear()
+        }
     }
 }
